@@ -69,3 +69,29 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+
+#chat-panel{
+    position: center;
+    z-index: 10;
+    width: fit-content;
+}
+
+#chat-history {
+}
+
+#chat-input-form {
+    position: center;
+    z-index: 10;
+    width: fit-content;
+}
+#chat-box {
+    position: center;
+    z-index: 10;
+    width: fit-content;
+}
+#text-area {
+    position: center;
+    z-index: 10;
+    width: fit-content;
+}

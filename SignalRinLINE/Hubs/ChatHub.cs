@@ -12,6 +12,15 @@ namespace SignalRinLINE.Hubs
         {
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
+
+        public override async Task OnConnectedAsync()
+        {
+            var username = Context.User.Identity.Name;
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, "??");
+            await Clients.Caller.SendAsync("ReceiveMessage","KoKo", "");
+            await base.OnConnectedAsync();
+        }
         public string GetConnectionId() => Context.ConnectionId;
 
     }

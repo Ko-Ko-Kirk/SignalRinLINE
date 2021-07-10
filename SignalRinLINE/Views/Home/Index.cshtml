@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "客服中心";
 }
 
 <div class="text-center">
@@ -31,6 +31,17 @@
 <div class="row">
     <div class="col-6">
         <ul id="messagesList"></ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12" id="chat-panel">
+        <ul id="chat-history"></ul>
+        <div id="text-area">
+            <form id="chat-input-form">
+                <input id="chat-box" type="text" placeholder="請輸入訊息" />
+                <button type="submit">送出</button>
+            </form>
+        </div>
     </div>
 </div>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>

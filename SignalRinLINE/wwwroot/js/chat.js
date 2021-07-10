@@ -26,5 +26,6 @@ document.getElementById("sendButton").addEventListener("click", function (e) {
     connection.invoke("SendMessage", user, message).catch(function (err) {
         return console.error(err.toString());
     });
+    
     e.preventDefault();
 });
