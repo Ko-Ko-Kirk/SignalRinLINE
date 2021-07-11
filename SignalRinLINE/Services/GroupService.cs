@@ -8,34 +8,67 @@ namespace SignalRinLINE.Services
 {
     public class GroupService : IGroupService
     {
+
+        private readonly Dictionary<Guid, ChatGroup> _groupInfo = 
+            new Dictionary<Guid, ChatGroup>();
+
+        private readonly Dictionary<Guid, List<ChatMessage>> _messageHistory = 
+            new Dictionary<Guid, List<ChatMessage>>();
+
         public Task AddMessage(Guid GroupId, ChatMessage message)
         {
-            throw new NotImplementedException();
+            if (!_messageHistory.ContainsKey(GroupId))
+            {
+                _messageHistory[GroupId] = new List<ChatMessage>();
+            }
+
+            _messageHistory[GroupId].Add(message);
+
+            return Task.CompletedTask;
         }
 
         public Task<Guid> CreateGroup(string connectionId)
         {
-            throw new NotImplementedException();
+            var id = Guid.NewGuid();
+            _groupInfo[id] = new ChatGroup
+            {
+                GroupConnectionId = connectionId, 
+            };
+
+            return Task.FromResult(id);
         }
 
         public Task<IReadOnlyDictionary<Guid, ChatGroup>> GetAllGroups()
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_groupInfo as IReadOnlyDictionary<Guid, ChatGroup>);
         }
 
         public Task<Guid> GetGroupForConnectionId(string connectionId)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_groupInfo.FirstOrDefault(
+                            x => x.Value.GroupConnectionId == connectionId).Key);
         }
 
-        public Task<IEnumerable<ChatMessage>> GetMessageHistory(Guid roomId)
+        public Task<IEnumerable<ChatMessage>> GetMessageHistory(Guid groupId)
         {
-            throw new NotImplementedException();
+            _messageHistory.TryGetValue(groupId, out var messages);
+
+            messages = messages ?? new List<ChatMessage>();
+            var sortMessages = messages
+                .OrderBy(x => x.SendTime)
+                .AsEnumerable();
+
+            return Task.FromResult(sortMessages);
         }
 
-        public Task SetGroupName(Guid GroupId, string name)
+        public Task SetGroupName(Guid groupId, string name)
         {
-            throw new NotImplementedException();
+            if (!_groupInfo.ContainsKey(groupId))
+                throw new ArgumentException("Invalid group ID");
+
+            _groupInfo[groupId].Name = name;
+
+            return Task.CompletedTask;
         }
     }
 }
