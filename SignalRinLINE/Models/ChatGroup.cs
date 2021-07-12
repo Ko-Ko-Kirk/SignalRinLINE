@@ -9,6 +9,6 @@ namespace SignalRinLINE.Models
     {
         public string GroupConnectionId { get; set; }
 
-        public string Name { get; set; }
+        public string GroupName { get; set; }
     }
 }

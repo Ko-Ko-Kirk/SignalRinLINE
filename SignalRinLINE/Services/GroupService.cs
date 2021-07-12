@@ -54,11 +54,8 @@ namespace SignalRinLINE.Services
             _messageHistory.TryGetValue(groupId, out var messages);
 
             messages = messages ?? new List<ChatMessage>();
-            var sortMessages = messages
-                .OrderBy(x => x.SendTime)
-                .AsEnumerable();
 
-            return Task.FromResult(sortMessages);
+            return Task.FromResult(messages.OrderBy(x => x.SendTime).AsEnumerable());
         }
 
         public Task SetGroupName(Guid groupId, string name)
@@ -66,7 +63,7 @@ namespace SignalRinLINE.Services
             if (!_groupInfo.ContainsKey(groupId))
                 throw new ArgumentException("Invalid group ID");
 
-            _groupInfo[groupId].Name = name;
+            _groupInfo[groupId].GroupName = name;
 
             return Task.CompletedTask;
         }

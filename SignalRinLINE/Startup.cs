@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,11 @@ namespace SignalRinLINE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
             services.AddControllersWithViews();
             services.AddSignalR();
             services.AddSingleton<IGroupService, GroupService>();
@@ -36,7 +42,7 @@ namespace SignalRinLINE
             })
             .AddCookie(options =>
             {
-                options.LoginPath = "/Login";
+                options.LoginPath = "/Home/Login";
             });
 
         }
@@ -70,6 +76,7 @@ namespace SignalRinLINE
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ChatHub>("/lineHub");
+                endpoints.MapHub<CallCenterHub>("/callCenterHub");
             });
         }
     }

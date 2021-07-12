@@ -15,4 +15,4 @@ namespace SignalRinLINE.Models
     }
 }
    
-}
+
