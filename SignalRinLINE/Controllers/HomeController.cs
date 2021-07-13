@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -7,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SignalRinLINE.Controllers
@@ -45,13 +49,29 @@ namespace SignalRinLINE.Controllers
             if (String.IsNullOrEmpty(account) || String.IsNullOrEmpty(password))
             {
                 ViewBag.Msg = "請輸入帳號密碼";
-                return View("Index");
+                return View("Login");
             }
             else
             {
                 if (userAccount.Equals(account) && userPassword.Equals(password))
                 {
-                    return RedirectToAction("CallCenter", "Home");
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, userAccount),
+                        new Claim(ClaimTypes.Role, "XiaoSuLa"),
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        RedirectUri = Url.Content("/Home/CallCenter"),
+                    };
+
+                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+                    return View();
                 }
                 else
                 {
@@ -59,8 +79,10 @@ namespace SignalRinLINE.Controllers
                     return View("Login");
                 }
             }
+
         }
 
+        [Authorize]
         public IActionResult CallCenter()
         {
             return View();
