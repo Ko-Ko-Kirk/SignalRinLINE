@@ -2,47 +2,133 @@
     ViewData["Title"] = "客服中心";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
 <div class="container">
-    <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="col-2">User</div>
-        <div class="col-4"><input type="text" id="userInput" /></div>
-    </div>
-    <div class="row">
-        <div class="col-2">Message</div>
-        <div class="col-4"><input type="text" id="messageInput" /></div>
-    </div>
-    <div class="row">&nbsp;</div>
     <div class="row">
         <div class="col-6">
-            <input type="button" id="sendButton" value="Send Message" />
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12" id="chat-panel">
+            <ul id="chat-history">
+                
+            </ul>
+            <div id="text-area">
+                <form id="chat-input-form">
+                    <input id="chat-box" type="text" placeholder="請輸入訊息" autocomplete="off" />
+                    <button id="chat-box-btn" type="submit" class="btn-info">送出</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-12">
-        <hr />
-    </div>
-</div>
-<div class="row">
-    <div class="col-6">
-        <ul id="messagesList"></ul>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12" id="chat-panel">
-        <ul id="chat-history"></ul>
-        <div id="text-area">
-            <form id="chat-input-form">
-                <input id="chat-box" type="text" placeholder="請輸入訊息" />
-                <button type="submit">送出</button>
-            </form>
-        </div>
-    </div>
-</div>
+<input type='hidden' id='userId' name="userId" />
+<input type='hidden' id='displayName' name="displayName" />
+<input type='hidden' id='pictureUrl' name="pictureUrl" />
+<input type='hidden' id='statusMessage' name="statusMessage" />
+
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chat.js"></script>
+<script src="~/js/moment/moment.min.js"></script>
+<script>
+    @*var liffID = '@ViewBag.LIFFID';
+    function initializeLiff(myLiffId) {
+        liff.init({
+            liffId: myLiffId
+            })
+            .then(() => {
+                liff.getProfile().then(function (e) {
+                    $("#userId").val(e.userId);
+                    $("#displayName").val(e.displayName);
+                    $("#pictureUrl").val(e.pictureUrl);
+                    $("#statusMessage").val(e.statusMessage);
+                });
+            })
+            .catch((err) => {
+                alert("網路連線不佳，請再重試一次 "+JSON.stringify(err));
+            });
+    }*@
+    $("#userId").val("A123456789");
+    $("#displayName").val("test1");
+    $("#pictureUrl").val("https://mvp.microsoft.com/zh-tw/PublicProfile/Photo/5003846");
+    $("#statusMessage").val("pupu");
+
+    var connection = new signalR.HubConnectionBuilder().withUrl('/lineHub').build();
+    connection.on('ReceiveMessage', renderMessage);
+
+    function startConnection() {
+        connection.start()
+            .then(onConnected)
+            .catch(function (err) {
+                console.error(err);
+            });
+    }
+
+    function onConnected() {
+        $("#chat-box").focus();
+        connection.invoke('SetName', $("#displayName").val(), $("#userId").val());
+    }
+
+
+    function renderMessage(name, id, pic, time, message) {
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = name;
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'time';
+        var formatTime = moment(time).format('H:mm');
+        timeSpan.textContent = formatTime;
+
+        var idSpan = document.createElement('span');
+        idSpan.className = 'id';
+        idSpan.textContent = id;
+
+        var headerDiv = document.createElement('div');
+        headerDiv.appendChild(nameSpan);
+        headerDiv.appendChild(idSpan);
+        headerDiv.appendChild(timeSpan);
+
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.textContent = message;
+
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.textContent = message;
+
+        var newItem = document.createElement('li');
+        var imgItem = document.createElement('img');
+        imgItem.src = pic
+        imgItem.style = "width: 30px";
+        newItem.appendChild(imgItem);
+        newItem.appendChild(headerDiv);
+        newItem.appendChild(messageDiv);
+
+        var chatHistory = document.getElementById('chat-history');
+        chatHistory.appendChild(newItem);
+        chatHistory.scrollTop = chatHistory.scrollHeight - chatHistory.clientHeight;
+    }
+
+    function SendMessage(name, id, pic, text) {
+        if (text && text.length) {
+            connection.invoke('SendMessage', name, id, pic, text);
+        }
+    }
+
+    $(document).ready(function () {
+        //initializeLiff(liffID);
+        startConnection();
+
+        $("#chat-input-form").submit(function (e) {
+            e.preventDefault();
+
+            var text = $("#chat-box").val();
+            $("#chat-box").val("");
+            SendMessage($("#displayName").val(), $("#userId").val(), $("#pictureUrl").val(), text);
+           
+        });
+
+
+    });
+
+</script>

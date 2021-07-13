@@ -86,12 +86,26 @@ body {
     width: fit-content;
 }
 #chat-box {
-    position: center;
-    z-index: 10;
-    width: fit-content;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 5%;
+    width: 80%;
+}
+#chat-box-btn {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    height: 5%;
+    width: 20%;
 }
 #text-area {
-    position: center;
-    z-index: 10;
-    width: fit-content;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 5%;
+    width: 100%;
+    background-color: red;
+    color: white;
+    text-align: center;
 }

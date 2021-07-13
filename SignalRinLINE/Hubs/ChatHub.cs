@@ -50,7 +50,7 @@ namespace SignalRinLINE.Hubs
 
             await _groupService.SetGroupName(groupId, groupName);
 
-            await _callCenterHub.Clients.All.SendAsync("ActiveRooms", await _groupService.GetAllGroups());
+            await _callCenterHub.Clients.All.SendAsync("ActiveGroups", await _groupService.GetAllGroups());
         }
 
         public override async Task OnConnectedAsync()
@@ -66,8 +66,10 @@ namespace SignalRinLINE.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
 
             await Clients.Caller.SendAsync("ReceiveMessage","KOKO的服務中心",
+                new ChatMessage().LineID,
+                new ChatMessage().LinePic,
                 DateTime.Now,
-                "您好，請問我可以幫您什麼忙嗎？");
+                new ChatMessage().Text);
 
             await base.OnConnectedAsync();
         }

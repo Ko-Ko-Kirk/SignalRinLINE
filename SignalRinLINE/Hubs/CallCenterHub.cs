@@ -37,6 +37,7 @@ namespace SignalRinLINE.Hubs
 
             await _chathub.Clients.Group(groupId.ToString()).SendAsync("ReceiveMessage",
                     message.LineName,
+                    message.LineID,
                     message.SendTime,
                     message.Text);
         }

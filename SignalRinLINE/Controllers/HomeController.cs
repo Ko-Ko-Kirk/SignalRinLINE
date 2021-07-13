@@ -29,6 +29,7 @@ namespace SignalRinLINE.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.LIFFID = _configuration.GetValue<string>("LIFF:LIFFID1");
             return View();
         }
 
