@@ -63,7 +63,7 @@
 
     function onConnected() {
         $("#chat-box").focus();
-        connection.invoke('SetName', $("#displayName").val(), $("#userId").val());
+        connection.invoke('CreateGroupSetName', $("#displayName").val(), $("#userId").val());
     }
 
 
@@ -74,16 +74,16 @@
 
         var timeSpan = document.createElement('span');
         timeSpan.className = 'time';
-        var formatTime = moment(time).format('H:mm');
+        var formatTime = moment(time).format('H:mm:ss');
         timeSpan.textContent = formatTime;
 
-        var idSpan = document.createElement('span');
-        idSpan.className = 'id';
-        idSpan.textContent = id;
+        //var idSpan = document.createElement('span');
+        //idSpan.className = 'id';
+        //idSpan.textContent = id;
 
         var headerDiv = document.createElement('div');
         headerDiv.appendChild(nameSpan);
-        headerDiv.appendChild(idSpan);
+        //headerDiv.appendChild(idSpan);
         headerDiv.appendChild(timeSpan);
 
         var messageDiv = document.createElement('div');

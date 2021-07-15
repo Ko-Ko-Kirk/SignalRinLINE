@@ -9,13 +9,13 @@ namespace SignalRinLINE.Services
     public class GroupService : IGroupService
     {
 
-        private readonly Dictionary<Guid, ChatGroup> _groupInfo = 
-            new Dictionary<Guid, ChatGroup>();
+        private readonly Dictionary<string, ChatGroup> _groupInfo = 
+            new Dictionary<string, ChatGroup>();
 
-        private readonly Dictionary<Guid, List<ChatMessage>> _messageHistory = 
-            new Dictionary<Guid, List<ChatMessage>>();
-
-        public Task AddMessage(Guid GroupId, ChatMessage message)
+        private readonly Dictionary<string, List<ChatMessage>> _messageHistory = 
+            new Dictionary<string, List<ChatMessage>>();
+        
+        public Task AddMessage(string GroupId, ChatMessage message)
         {
             if (!_messageHistory.ContainsKey(GroupId))
             {
@@ -27,29 +27,29 @@ namespace SignalRinLINE.Services
             return Task.CompletedTask;
         }
 
-        public Task<Guid> CreateGroup(string connectionId)
+        public Task<string> CreateGroup(string connectionId, string lineID)
         {
-            var id = Guid.NewGuid();
-            _groupInfo[id] = new ChatGroup
+            
+            _groupInfo[lineID] = new ChatGroup
             {
                 GroupConnectionId = connectionId, 
             };
 
-            return Task.FromResult(id);
+            return Task.FromResult(lineID);
         }
 
-        public Task<IReadOnlyDictionary<Guid, ChatGroup>> GetAllGroups()
+        public Task<IReadOnlyDictionary<string, ChatGroup>> GetAllGroups()
         {
-            return Task.FromResult(_groupInfo as IReadOnlyDictionary<Guid, ChatGroup>);
+            return Task.FromResult(_groupInfo as IReadOnlyDictionary<string, ChatGroup>);
         }
 
-        public Task<Guid> GetGroupForConnectionId(string connectionId)
+        public Task<string> GetGroupForConnectionId(string connectionId)
         {
             return Task.FromResult(_groupInfo.FirstOrDefault(
                             x => x.Value.GroupConnectionId == connectionId).Key);
         }
 
-        public Task<IEnumerable<ChatMessage>> GetMessageHistory(Guid groupId)
+        public Task<IEnumerable<ChatMessage>> GetMessageHistory(string groupId)
         {
             _messageHistory.TryGetValue(groupId, out var messages);
 
@@ -58,7 +58,7 @@ namespace SignalRinLINE.Services
             return Task.FromResult(messages.OrderBy(x => x.SendTime).AsEnumerable());
         }
 
-        public Task SetGroupName(Guid groupId, string name)
+        public Task SetGroupName(string groupId, string name)
         {
             if (!_groupInfo.ContainsKey(groupId))
                 throw new ArgumentException("Invalid group ID");

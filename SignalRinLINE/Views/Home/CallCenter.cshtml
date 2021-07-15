@@ -129,16 +129,16 @@
 
         var timeSpan = document.createElement('span');
         timeSpan.className = 'time';
-        var friendlyTime = moment(time).format('H:mm');
+        var friendlyTime = moment(time).format('H:mm:ss');
         timeSpan.textContent = friendlyTime;
 
-        var idSpan = document.createElement('span');
-        idSpan.className = 'id';
-        idSpan.textContent = id;
+        //var idSpan = document.createElement('span');
+        //idSpan.className = 'id';
+        //idSpan.textContent = id;
 
         var headerDiv = document.createElement('div');
         headerDiv.appendChild(nameSpan);
-        headerDiv.appendChild(idSpan);
+        //headerDiv.appendChild(idSpan);
         headerDiv.appendChild(timeSpan);
 
         var messageDiv = document.createElement('div');

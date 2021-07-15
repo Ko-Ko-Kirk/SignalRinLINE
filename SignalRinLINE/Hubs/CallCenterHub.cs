@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SignalRinLINE.Hubs
 {
-    //[Authorize]
+    [Authorize]
     public class CallCenterHub : Hub
     {
         private readonly IGroupService _groupService;
@@ -26,7 +26,7 @@ namespace SignalRinLINE.Hubs
             await base.OnConnectedAsync();
         }
 
-        public async Task SendCallCenterMessage(Guid groupId, string text)
+        public async Task SendCallCenterMessage(string groupId, string text)
         {
             var message = new ChatMessage
             {
@@ -45,7 +45,7 @@ namespace SignalRinLINE.Hubs
                     message.Text);
         }
 
-        public async Task LoadHistory(Guid groupId)
+        public async Task LoadHistory(string groupId)
         {
             var history = await _groupService.GetMessageHistory(groupId);
 

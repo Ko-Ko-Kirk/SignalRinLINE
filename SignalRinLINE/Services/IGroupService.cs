@@ -8,16 +8,16 @@ namespace SignalRinLINE.Services
 {
     public interface IGroupService
     {
-        Task<Guid> CreateGroup(string connectionId);
+        Task<string> CreateGroup(string connectionId, string lineID);
 
-        Task<Guid> GetGroupForConnectionId(string connectionId);
+        Task<string> GetGroupForConnectionId(string connectionId);
 
-        Task SetGroupName(Guid GroupId, string name);
+        Task SetGroupName(string GroupId, string name);
 
-        Task AddMessage(Guid GroupId, ChatMessage message);
+        Task AddMessage(string GroupId, ChatMessage message);
 
-        Task<IEnumerable<ChatMessage>> GetMessageHistory(Guid roomId);
+        Task<IEnumerable<ChatMessage>> GetMessageHistory(string groupId);
 
-        Task<IReadOnlyDictionary<Guid, ChatGroup>> GetAllGroups();
+        Task<IReadOnlyDictionary<string, ChatGroup>> GetAllGroups();
     }
 }

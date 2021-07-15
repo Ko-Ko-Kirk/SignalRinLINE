@@ -19,22 +19,22 @@ namespace SignalRinLINE.Hubs
             _callCenterHub = callCenterHub;
         }
 
-        public async Task SendMessage(string name, string id, string pic, string text)
+        public async Task SendMessage(string name, string lineID, string pic, string text)
         {
-            var groupId = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
-
+            var groupID = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
+           
             var message = new ChatMessage
             {
                 LineName = name,
-                LineID = id,
+                LineID = lineID,
                 LinePic = pic,
                 Text = text,
                 SendTime = DateTime.Now
             };
 
-            await _groupService.AddMessage(groupId, message);
+            await _groupService.AddMessage(groupID, message);
 
-            await Clients.Group(groupId.ToString()).SendAsync("ReceiveMessage",
+            await Clients.Group(groupID.ToString()).SendAsync("ReceiveMessage",
                 message.LineName,
                 message.LineID,
                 message.LinePic,
@@ -42,9 +42,13 @@ namespace SignalRinLINE.Hubs
                 message.Text);
         }
 
-        public async Task SetName(string lineName, string lineID)
+        public async Task CreateGroupSetName(string lineName, string lineID)
         {
             var groupName = $"{lineName} {lineID}";
+
+            var groupID = await _groupService.CreateGroup(Context.ConnectionId, lineID);
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupID.ToString());
 
             var groupId = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
 
@@ -53,6 +57,7 @@ namespace SignalRinLINE.Hubs
             await _callCenterHub.Clients.All.SendAsync("ActiveGroups", await _groupService.GetAllGroups());
         }
 
+
         public override async Task OnConnectedAsync()
         {
             if (Context.User.Identity.IsAuthenticated)
@@ -60,10 +65,6 @@ namespace SignalRinLINE.Hubs
                 await base.OnConnectedAsync();
                 return;
             }
-
-            var groupId = await _groupService.CreateGroup(Context.ConnectionId);
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
 
             await Clients.Caller.SendAsync("ReceiveMessage","KOKO的服務中心",
                 new ChatMessage().LineID,
@@ -76,13 +77,13 @@ namespace SignalRinLINE.Hubs
 
 
         [Authorize]
-        public async Task JoinGroup(Guid groupId)
+        public async Task JoinGroup(string groupId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
         }
 
         [Authorize]
-        public async Task LeaveGroup(Guid groupId)
+        public async Task LeaveGroup(string groupId)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());
         }

@@ -78,7 +78,9 @@ body {
 }
 
 #chat-history {
-    height: 600px;
+    height: 95%;
+    border:solid;
+    border-radius: 3px;
 }
 
 #chat-input-form {
@@ -109,4 +111,13 @@ body {
     background-color: red;
     color: white;
     text-align: center;
+}
+.message {
+    font-weight: bold;
+}
+.name {
+    color: blue;
+}
+.time {
+    padding-left: 3px;
 }
