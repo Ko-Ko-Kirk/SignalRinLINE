@@ -86,6 +86,7 @@
 
         chatHubConnection.invoke('JoinGroup', activegroupId);
         centerConnection.invoke('LoadHistory', activegroupId);
+        console.log(activegroupId);
     }
 
     function setActiveGroupButton(el) {

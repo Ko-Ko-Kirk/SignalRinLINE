@@ -32,9 +32,9 @@ namespace SignalRinLINE.Hubs
                 SendTime = DateTime.Now
             };
 
-            await _groupService.AddMessage(groupID, message);
+            await _groupService.AddMessage(lineID, message);
 
-            await Clients.Group(groupID.ToString()).SendAsync("ReceiveMessage",
+            await Clients.Group(lineID).SendAsync("ReceiveMessage",
                 message.LineName,
                 message.LineID,
                 message.LinePic,
@@ -52,7 +52,7 @@ namespace SignalRinLINE.Hubs
 
             var groupId = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
 
-            await _groupService.SetGroupName(groupId, groupName);
+            await _groupService.SetGroupName(lineID, groupName);
 
             await _callCenterHub.Clients.All.SendAsync("ActiveGroups", await _groupService.GetAllGroups());
         }
@@ -79,13 +79,13 @@ namespace SignalRinLINE.Hubs
         [Authorize]
         public async Task JoinGroup(string groupId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
         }
 
         [Authorize]
         public async Task LeaveGroup(string groupId)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
         }
 
     }

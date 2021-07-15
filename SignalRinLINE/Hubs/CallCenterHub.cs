@@ -48,7 +48,7 @@ namespace SignalRinLINE.Hubs
         public async Task LoadHistory(string groupId)
         {
             var history = await _groupService.GetMessageHistory(groupId);
-
+ 
             await Clients.Caller.SendAsync("ReceiveMessages", history);
         }
 

@@ -10,7 +10,7 @@
     </div>
     <div class="row">
         <div class="col-12" id="chat-panel">
-            <ul id="chat-history"></ul>
+            <ul id="chat-history-client"></ul>
             <div id="text-area">
                 <form id="chat-input-form">
                     <input id="chat-box" type="text" placeholder="請輸入訊息" autocomplete="off" />
@@ -28,7 +28,7 @@
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/moment/moment.min.js"></script>
 <script>
-    @*var liffID = '@ViewBag.LIFFID';
+    var liffID = '@ViewBag.LIFFID';
     function initializeLiff(myLiffId) {
         liff.init({
             liffId: myLiffId
@@ -44,11 +44,11 @@
             .catch((err) => {
                 alert("網路連線不佳，請再重試一次 "+JSON.stringify(err));
             });
-    }*@
-    $("#userId").val("A123456789");
-    $("#displayName").val("test1");
-    $("#pictureUrl").val("https://mvp.microsoft.com/zh-tw/PublicProfile/Photo/5003846");
-    $("#statusMessage").val("pupu");
+    }
+    //$("#userId").val("A123456789");
+    //$("#displayName").val("test1");
+    //$("#pictureUrl").val("https://mvp.microsoft.com/zh-tw/PublicProfile/Photo/5003846");
+    //$("#statusMessage").val("pupu");
 
     var connection = new signalR.HubConnectionBuilder().withUrl('/lineHub').build();
     connection.on('ReceiveMessage', renderMessage);
@@ -102,7 +102,7 @@
         newItem.appendChild(headerDiv);
         newItem.appendChild(messageDiv);
 
-        var chatHistory = document.getElementById('chat-history');
+        var chatHistory = document.getElementById('chat-history-client');
         chatHistory.appendChild(newItem);
         chatHistory.scrollTop = chatHistory.scrollHeight - chatHistory.clientHeight;
     }
@@ -114,7 +114,7 @@
     }
 
     $(document).ready(function () {
-        //initializeLiff(liffID);
+        initializeLiff(liffID);
         startConnection();
 
         $("#chat-input-form").submit(function (e) {

@@ -83,6 +83,10 @@ body {
     border-radius: 3px;
 }
 
+#chat-history-client {
+    height: 95%;
+}
+
 #chat-input-form {
     position: center;
     z-index: 10;
