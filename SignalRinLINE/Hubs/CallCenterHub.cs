@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using SignalRinLINE.Models;
 using SignalRinLINE.Services;
 using System;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SignalRinLINE.Hubs
 {
+    //[Authorize]
     public class CallCenterHub : Hub
     {
         private readonly IGroupService _groupService;
@@ -38,6 +40,7 @@ namespace SignalRinLINE.Hubs
             await _chathub.Clients.Group(groupId.ToString()).SendAsync("ReceiveMessage",
                     message.LineName,
                     message.LineID,
+                    message.LinePic,
                     message.SendTime,
                     message.Text);
         }

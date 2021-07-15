@@ -78,6 +78,7 @@ body {
 }
 
 #chat-history {
+    height: 600px;
 }
 
 #chat-input-form {

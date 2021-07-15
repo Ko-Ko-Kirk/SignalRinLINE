@@ -4,4 +4,218 @@
 @{
 
 }
-@User.Identity.Name;
+@User.Identity.Name 您好;
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <div id="group-list-area" class="group-list">
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="row">
+                <div class="col-12">
+                    <div>
+                        <ul id="chat-history"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <form id="chat-input-form" class="form-inline mt-2" autocomplete="off">
+                        <input id="call-center-chat-box" type="text" placeholder="請輸入訊息" class="form-control mr-sm-2 flex-grow-1" />
+                        <button type="submit" class="btn btn-primary">送出</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/moment/moment.min.js"></script>
+<script>
+    var activegroupId = '';
+    var groupListEl = document.getElementById('group-list-area');
+    var groupHistoryEl = document.getElementById('chat-history');
+
+    var centerConnection = new signalR.HubConnectionBuilder().withUrl('/callCenterHub')
+        .configureLogging(signalR.LogLevel.Debug).build();
+    centerConnection.on('ActiveGroups', loadGroups);
+    centerConnection.onclose(function () {
+        handleDisconnected(startCenterConnection);
+    });
+
+    function startCenterConnection() {
+        centerConnection.start().catch(function (err) {
+                console.log(err);
+            });
+    }
+
+    var chatHubConnection = new signalR.HubConnectionBuilder().withUrl('/lineHub').build();
+    chatHubConnection.onclose(function () {
+        handleDisconnected(startChatHubConnection);
+    });
+
+    function startChatHubConnection() {
+        chatHubConnection.start().catch(function (err) {
+                console.log(err);
+            });
+    }
+
+    chatHubConnection.on('ReceiveMessage', renderMessage);
+    centerConnection.on('ReceiveMessages', addMessages);
+ 
+    function SendMessage(text) {
+        if (text && text.length) {
+            centerConnection.invoke('SendCallCenterMessage', activegroupId, text);
+        }
+    }
+    
+    function switchActiveGroupTo(id) {
+       
+        if (id === activegroupId) return;
+
+        if (activegroupId) {
+            chatHubConnection.invoke('LeaveGroup', activegroupId);
+        }
+
+        activegroupId = id;
+        removeAllChildren(groupHistoryEl);
+
+        if (!id) return;
+
+        chatHubConnection.invoke('JoinGroup', activegroupId);
+        centerConnection.invoke('LoadHistory', activegroupId);
+    }
+
+    function setActiveGroupButton(el) {
+        var allButtons = groupListEl.querySelectorAll('a.list-group-item');
+
+        allButtons.forEach(function (btn) {
+            btn.classList.remove('active');
+        });
+
+        el.classList.add('active');
+    }
+
+
+    groupListEl.addEventListener('click', function (e) {
+        groupHistoryEl.style.display = 'block';
+        //groupHistoryEl.css("display", "block");
+
+        setActiveGroupButton(e.target);
+
+        var groupId = e.target.getAttribute('data-id');
+        switchActiveGroupTo(groupId);
+    });
+
+    function addMessages(messages) {
+
+        if (!messages) return;
+
+        messages.forEach(function (m) {
+            renderMessage(m.LineName,
+                m.LineID,
+                m.LinePic,
+                m.SendTime,
+                m.Text);
+        });
+    }
+
+    function renderMessage(name, id, pic, time, message) {
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = name;
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'time';
+        var friendlyTime = moment(time).format('H:mm');
+        timeSpan.textContent = friendlyTime;
+
+        var idSpan = document.createElement('span');
+        idSpan.className = 'id';
+        idSpan.textContent = id;
+
+        var headerDiv = document.createElement('div');
+        headerDiv.appendChild(nameSpan);
+        headerDiv.appendChild(idSpan);
+        headerDiv.appendChild(timeSpan);
+
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.textContent = message;
+
+        var newItem = document.createElement('li');
+        var imgItem = document.createElement('img');
+        imgItem.src = pic
+        imgItem.style = "width: 30px";
+        newItem.appendChild(imgItem);
+        newItem.appendChild(headerDiv);
+        newItem.appendChild(messageDiv);
+
+        groupHistoryEl.appendChild(newItem);
+        groupHistoryEl.scrollTop = groupHistoryEl.scrollHeight - groupHistoryEl.clientHeight;
+    }
+
+    function loadGroups(groups) {
+        if (!groups) return;
+
+        var groupIds = Object.keys(groups);
+        if (!groupIds.length) return;
+        switchActiveGroupTo(null);
+
+        removeAllChildren(groupListEl);
+
+        groupIds.forEach(function (id) {
+
+            var groupInfo = groups[id];
+            console.log(groupIds[0]);
+
+            if (!groupInfo.groupName) {
+                console.log(groupInfo);
+                return;
+            } 
+
+            var groupButton = creategroupButton(id, groupInfo);
+            groupListEl.appendChild(groupButton);
+
+        });
+    }
+
+    function creategroupButton(id, groupInfo) {
+        var anchorEl = document.createElement('a');
+        anchorEl.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+        anchorEl.setAttribute('data-id', id);
+        anchorEl.textContent = groupInfo.groupName;
+        anchorEl.href = '#';
+        return anchorEl;
+    }
+
+    function removeAllChildren(node) {
+        if (!node) return;
+
+        while (node.lastChild) {
+            node.removeChild(node.lastChild);
+        }
+    }
+
+    function handleDisconnected(retryFunc) {
+        console.log("五秒後重新連線");
+        setTimeout(retryFunc, 5000);
+    }
+
+    $(document).ready(function () {
+        startCenterConnection();
+        startChatHubConnection();
+
+
+        $("#chat-input-form").submit(function (e) {
+            e.preventDefault();
+
+            var text = $("#call-center-chat-box").val();
+            $("#call-center-chat-box").val("");
+            SendMessage(text);
+        });
+    });
+
+</script>

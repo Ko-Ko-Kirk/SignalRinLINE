@@ -71,6 +71,7 @@ namespace SignalRinLINE
                 endpoints.MapHub<ChatHub>("/lineHub");
                 endpoints.MapHub<CallCenterHub>("/callCenterHub");
             });
+
         }
     }
 }
