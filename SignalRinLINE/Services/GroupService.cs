@@ -28,8 +28,7 @@ namespace SignalRinLINE.Services
         }
 
         public Task<string> CreateGroup(string connectionId, string lineID)
-        {
-            
+        {  
             _groupInfo[lineID] = new ChatGroup
             {
                 GroupConnectionId = connectionId, 
@@ -43,6 +42,11 @@ namespace SignalRinLINE.Services
             return Task.FromResult(_groupInfo as IReadOnlyDictionary<string, ChatGroup>);
         }
 
+        public Task<Boolean> CheckGroupIfExist(string lineID)
+        {
+            return Task.FromResult(_groupInfo.ContainsKey(lineID));
+        }
+
         public Task<string> GetGroupForConnectionId(string connectionId)
         {
             return Task.FromResult(_groupInfo.FirstOrDefault(
@@ -54,8 +58,8 @@ namespace SignalRinLINE.Services
             _messageHistory.TryGetValue(groupId, out var messages);
 
             messages = messages ?? new List<ChatMessage>();
-
-            return Task.FromResult(messages.OrderBy(x => x.SendTime).AsEnumerable());
+            var messageOrder = messages.OrderBy(x => x.SendTime).AsEnumerable();
+            return Task.FromResult(messageOrder);
         }
 
         public Task SetGroupName(string groupId, string name)

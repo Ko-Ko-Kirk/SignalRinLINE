@@ -51,19 +51,20 @@
             });
     }
 
-    var chatHubConnection = new signalR.HubConnectionBuilder().withUrl('/lineHub').build();
+    var chatHubConnection = new signalR.HubConnectionBuilder().withUrl('/lineHub')
+        .configureLogging(signalR.LogLevel.Debug).build();
     chatHubConnection.onclose(function () {
         handleDisconnected(startChatHubConnection);
     });
+
+    chatHubConnection.on('ReceiveMessage', renderMessage);
+    centerConnection.on('ReceiveMessages', addMessages);
 
     function startChatHubConnection() {
         chatHubConnection.start().catch(function (err) {
                 console.log(err);
             });
     }
-
-    chatHubConnection.on('ReceiveMessage', renderMessage);
-    centerConnection.on('ReceiveMessages', addMessages);
  
     function SendMessage(text) {
         if (text && text.length) {
@@ -86,7 +87,6 @@
 
         chatHubConnection.invoke('JoinGroup', activegroupId);
         centerConnection.invoke('LoadHistory', activegroupId);
-        console.log(activegroupId);
     }
 
     function setActiveGroupButton(el) {
@@ -111,35 +111,30 @@
     });
 
     function addMessages(messages) {
-
         if (!messages) return;
 
         messages.forEach(function (m) {
-            renderMessage(m.LineName,
-                m.LineID,
-                m.LinePic,
-                m.SendTime,
-                m.Text);
+            renderMessage(m.lineName,
+                m.lineID,
+                m.linePic,
+                m.text,
+                m.sendTime
+            );
         });
     }
 
-    function renderMessage(name, id, pic, time, message) {
+    function renderMessage(name, id, pic, message, time) {
         var nameSpan = document.createElement('span');
         nameSpan.className = 'name';
         nameSpan.textContent = name;
 
         var timeSpan = document.createElement('span');
         timeSpan.className = 'time';
-        var friendlyTime = moment(time).format('H:mm:ss');
-        timeSpan.textContent = friendlyTime;
-
-        //var idSpan = document.createElement('span');
-        //idSpan.className = 'id';
-        //idSpan.textContent = id;
+        var formatTime = moment(time).format('H:mm:ss');
+        timeSpan.textContent = formatTime;
 
         var headerDiv = document.createElement('div');
         headerDiv.appendChild(nameSpan);
-        //headerDiv.appendChild(idSpan);
         headerDiv.appendChild(timeSpan);
 
         var messageDiv = document.createElement('div');
@@ -148,7 +143,7 @@
 
         var newItem = document.createElement('li');
         var imgItem = document.createElement('img');
-        imgItem.src = pic
+        imgItem.setAttribute("src", pic);
         imgItem.style = "width: 30px";
         newItem.appendChild(imgItem);
         newItem.appendChild(headerDiv);
@@ -170,7 +165,6 @@
         groupIds.forEach(function (id) {
 
             var groupInfo = groups[id];
-            console.log(groupIds[0]);
 
             if (!groupInfo.groupName) {
                 console.log(groupInfo);

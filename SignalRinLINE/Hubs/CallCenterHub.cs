@@ -41,14 +41,15 @@ namespace SignalRinLINE.Hubs
                     message.LineName,
                     message.LineID,
                     message.LinePic,
-                    message.SendTime,
-                    message.Text);
+                    message.Text,
+                    message.SendTime
+                    );
         }
 
         public async Task LoadHistory(string groupId)
         {
             var history = await _groupService.GetMessageHistory(groupId);
- 
+
             await Clients.Caller.SendAsync("ReceiveMessages", history);
         }
 

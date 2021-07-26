@@ -45,7 +45,7 @@
                 alert("網路連線不佳，請再重試一次 "+JSON.stringify(err));
             });
     }
-    //$("#userId").val("A123456789");
+    //$("#userId").val("A1234567890");
     //$("#displayName").val("test1");
     //$("#pictureUrl").val("https://mvp.microsoft.com/zh-tw/PublicProfile/Photo/5003846");
     //$("#statusMessage").val("pupu");
@@ -67,7 +67,7 @@
     }
 
 
-    function renderMessage(name, id, pic, time, message) {
+    function renderMessage(name, id, pic, message, time) {
         var nameSpan = document.createElement('span');
         nameSpan.className = 'name';
         nameSpan.textContent = name;
@@ -77,18 +77,9 @@
         var formatTime = moment(time).format('H:mm:ss');
         timeSpan.textContent = formatTime;
 
-        //var idSpan = document.createElement('span');
-        //idSpan.className = 'id';
-        //idSpan.textContent = id;
-
         var headerDiv = document.createElement('div');
         headerDiv.appendChild(nameSpan);
-        //headerDiv.appendChild(idSpan);
         headerDiv.appendChild(timeSpan);
-
-        var messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-        messageDiv.textContent = message;
 
         var messageDiv = document.createElement('div');
         messageDiv.className = 'message';

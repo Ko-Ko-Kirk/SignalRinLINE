@@ -5,6 +5,7 @@ using SignalRinLINE.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SignalRinLINE.Hubs
@@ -20,9 +21,7 @@ namespace SignalRinLINE.Hubs
         }
 
         public async Task SendMessage(string name, string lineID, string pic, string text)
-        {
-            var groupID = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
-           
+        {           
             var message = new ChatMessage
             {
                 LineName = name,
@@ -38,20 +37,23 @@ namespace SignalRinLINE.Hubs
                 message.LineName,
                 message.LineID,
                 message.LinePic,
-                message.SendTime,
-                message.Text);
+                message.Text,
+                message.SendTime
+                );
         }
 
         public async Task CreateGroupSetName(string lineName, string lineID)
         {
             var groupName = $"{lineName} {lineID}";
 
-            var groupID = await _groupService.CreateGroup(Context.ConnectionId, lineID);
+            bool groupExist = await _groupService.CheckGroupIfExist(lineID);
+            if (!groupExist)
+            {
+                var groupID = await _groupService.CreateGroup(Context.ConnectionId, lineID);
 
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupID.ToString());
-
-            var groupId = await _groupService.GetGroupForConnectionId(Context.ConnectionId);
-
+                await Groups.AddToGroupAsync(Context.ConnectionId, groupID.ToString());
+            }
+              
             await _groupService.SetGroupName(lineID, groupName);
 
             await _callCenterHub.Clients.All.SendAsync("ActiveGroups", await _groupService.GetAllGroups());
@@ -69,8 +71,9 @@ namespace SignalRinLINE.Hubs
             await Clients.Caller.SendAsync("ReceiveMessage","KOKO的服務中心",
                 new ChatMessage().LineID,
                 new ChatMessage().LinePic,
-                DateTime.Now,
-                new ChatMessage().Text);
+                new ChatMessage().Text,
+                DateTime.Now
+                );
 
             await base.OnConnectedAsync();
         }

@@ -19,5 +19,7 @@ namespace SignalRinLINE.Services
         Task<IEnumerable<ChatMessage>> GetMessageHistory(string groupId);
 
         Task<IReadOnlyDictionary<string, ChatGroup>> GetAllGroups();
+
+        Task<Boolean> CheckGroupIfExist(string lineID);
     }
 }
