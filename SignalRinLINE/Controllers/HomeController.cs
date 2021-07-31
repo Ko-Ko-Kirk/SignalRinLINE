@@ -33,6 +33,11 @@ namespace SignalRinLINE.Controllers
             return View();
         }
 
+        public IActionResult UseLINE()
+        {
+            return View();
+        }
+
         public IActionResult Login()
         {
             return View();

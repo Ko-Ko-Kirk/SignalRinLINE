@@ -39,7 +39,10 @@
                     $("#displayName").val(e.displayName);
                     $("#pictureUrl").val(e.pictureUrl);
                     $("#statusMessage").val(e.statusMessage);
-                });
+                })
+                    .catch(() => {
+                        window.location.replace("@Url.Action("UseLINE", "Home")");
+                    });
             })
             .catch((err) => {
                 alert("網路連線不佳，請再重試一次 "+JSON.stringify(err));
@@ -114,10 +117,8 @@
             var text = $("#chat-box").val();
             $("#chat-box").val("");
             SendMessage($("#displayName").val(), $("#userId").val(), $("#pictureUrl").val(), text);
-           
+
         });
-
-
     });
 
 </script>

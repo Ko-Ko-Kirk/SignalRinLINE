@@ -158,7 +158,6 @@
 
         var groupIds = Object.keys(groups);
         if (!groupIds.length) return;
-        switchActiveGroupTo(null);
 
         removeAllChildren(groupListEl);
 
@@ -167,7 +166,6 @@
             var groupInfo = groups[id];
 
             if (!groupInfo.groupName) {
-                console.log(groupInfo);
                 return;
             } 
 
